@@ -40,19 +40,19 @@
     git clone https://github.com/r351n/webamooz-assistant-bot.git
     ```
 
-2. Install the dependencies:
+2. Navigate to the project directory:
+    ```
+    cd webamooz-assistant-bot
+    ```
+
+3. Install the dependencies:
     ```
     pip install -r requirements.txt
     ```
 
 ### Usage
 
-1. Navigate to the project directory:
-    ```
-    cd webamooz-assistant-bot
-    ```
-
-2. Run the script:
+1. Run the script:
     ```
     python3 kernel.py
     ```
