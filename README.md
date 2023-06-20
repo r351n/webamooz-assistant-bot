@@ -52,14 +52,19 @@
 
 ### Usage
 
-1. Run the script:
+1. Modify credentials.py
+   ```
+   Add your <bot_token> as string, eg. "ABCDEFGHIJKLMNOP123abcdefg"
+   ```
+
+2. Run the script:
     ```
     python3 kernel.py
     ```
 
 ## 🤝 Contributing
 
-Contributions, issues and feature requests are welcome! Feel free to check the [issues page](https://github.com/r351n/webamooz-assistant-bot/issues).
+Contributions, issues, and feature requests are welcome! Feel free to check the [issues page](https://github.com/r351n/webamooz-assistant-bot/issues).
 
 ## 📝 License
 
