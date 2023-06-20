@@ -1,6 +1,6 @@
 
 
-<h1 align="center">🔍 Mooshyab 7 - Farabiran ID Searcher 🔍</h1>
+<h1 align="center">👥 Webamooz writer group - assistant 👥</h1>
 
 <p align="center">
     <img src="https://img.shields.io/github/repo-size/r351n/webamooz-assistant-bot" alt="Repo Size">
