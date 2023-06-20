@@ -1,8 +1,11 @@
 # Byte-compiled / optimized / DLL files
 __pycache__/
+backup/
 *.py[cod]
 *$py.class
-
+credentials.py
+bot.log
+webamooz.db
 # C extensions
 *.so
 
