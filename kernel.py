@@ -34,6 +34,7 @@ async def start_command(message: types.Message):
     keyboard_markup = ReplyKeyboardMarkup(resize_keyboard=True)
     keyboard_markup.add("👤 بر اساس افراد", "☢️ بر اساس پروژه و شرکت ها")
     keyboard_markup.row("♨️ بر اساس طرح های پانزی", "🔥 هشتگ های ترند")
+    keyboard_markup.add("📚 نویسندگان + موضوعات ثبت شده")
     await message.answer("لطفاً یک دسته بندی را انتخاب کنید:", reply_markup=keyboard_markup)
 
 
@@ -83,6 +84,36 @@ async def register_topic(message: types.Message, state: FSMContext):
     else:
         await message.answer("شما قبلاً برای این موضوع ثبت نام کرده‌اید")
 
+async def show_all_writers_with_topics(message: types.Message):
+    logging.info('show_all_writers_with_topics initiated by user %s', message.from_user.id)
+    cursor = conn.cursor()
+    cursor.execute("SELECT user_id, topic FROM registered_users")
+    rows = cursor.fetchall()
+    if rows:
+        message_str = ""
+        for row in rows:
+            chat = await bot.get_chat(row[0])
+            username = "@" + (chat.username or 'anonymous')
+
+            # Determine category
+            if row[1] in topics_by_person:
+                category = "بر اساس افراد"
+            elif row[1] in topics_by_project:
+                category = "بر اساس پروژه و شرکت ها"
+            elif row[1] in topics_by_panzi:
+                category = "بر اساس طرح های پانزی"
+            elif row[1] in trending_hashtags:
+                category = "هشتگ های ترند"
+            else:
+                category = "غیره"
+
+            message_str += f"<b>Username:</b> {username}\n<b>Category:</b> {category}\n<b>Topic</b> {row[1]}\n\n"
+        await bot.send_message(message.chat.id, f"نویسندگان و موضوعات:\n\n{message_str}", parse_mode='HTML')
+    else:
+        await bot.send_message(message.chat.id, "هیچ نویسنده و موضوعی ثبت‌نام نکرده است", parse_mode='HTML')
+
+
+
 async def on_startup(dp):
     me = await bot.get_me()
     logging.info('Bot has started. Bot info: %s', me)
@@ -102,5 +133,6 @@ if __name__ == '__main__':
     dp.register_message_handler(show_writers, Text(equals="👥 نویسندگان"))
     dp.register_message_handler(register_topic, Text(equals="ثبت نام"))
     dp.register_message_handler(start_command, Text(equals="🔙 بازگشت"))
+    dp.register_message_handler(show_all_writers_with_topics, Text(equals="📚 نویسندگان + موضوعات ثبت شده"))
 
     executor.start_polling(dp, on_startup=on_startup, skip_updates=True)
