@@ -30,24 +30,12 @@ async def init_db():
             )
         """)
 
-from datetime import datetime
-
-from datetime import datetime
-
 async def start_command(message: types.Message):
     logging.info('start_command initiated by user %s', message.from_user.id)
     
     # Getting the user's first name and the current hour
     first_name = message.from_user.first_name
-    current_hour = datetime.now().hour
-
-    # Determining the part of the day
-    if 5 <= current_hour < 12:
-        greeting = f"صبح بخیر, {first_name}!"
-    elif 12 <= current_hour < 18:
-        greeting = f"عصر بخیر, {first_name}!"
-    else:
-        greeting = f"شب بخیر, {first_name}!"
+    greeting = f"وقت بخیر, {first_name}!"
     
     # A sentence about security
     security_message = "امنیت اطلاعات شما برای ما از اهمیت بالایی برخوردار است. هیچ اطلاعاتی بدون رضایت شما ذخیره یا استفاده نمی‌شود."
