@@ -8,6 +8,7 @@ from aiogram.types import ReplyKeyboardMarkup
 import sqlite3
 from topics import topics_by_person, topics_by_project, topics_by_panzi, trending_hashtags
 from credentials import TOKEN
+from aiogram.types import ReplyKeyboardRemove
 
 # Configuring logging
 logging.basicConfig(level=logging.INFO, filename='bot.log',
@@ -29,13 +30,34 @@ async def init_db():
             )
         """)
 
+from datetime import datetime
+
+from datetime import datetime
+
 async def start_command(message: types.Message):
     logging.info('start_command initiated by user %s', message.from_user.id)
+    
+    # Getting the user's first name and the current hour
+    first_name = message.from_user.first_name
+    current_hour = datetime.now().hour
+
+    # Determining the part of the day
+    if 5 <= current_hour < 12:
+        greeting = f"صبح بخیر, {first_name}!"
+    elif 12 <= current_hour < 18:
+        greeting = f"عصر بخیر, {first_name}!"
+    else:
+        greeting = f"شب بخیر, {first_name}!"
+    
+    # A sentence about security
+    security_message = "امنیت اطلاعات شما برای ما از اهمیت بالایی برخوردار است. هیچ اطلاعاتی بدون رضایت شما ذخیره یا استفاده نمی‌شود."
+
     keyboard_markup = ReplyKeyboardMarkup(resize_keyboard=True)
     keyboard_markup.add("👤 بر اساس افراد", "☢️ بر اساس پروژه و شرکت ها")
     keyboard_markup.row("♨️ بر اساس طرح های پانزی", "🔥 هشتگ های ترند")
-    keyboard_markup.add("📚 نویسندگان + موضوعات ثبت شده")
-    await message.answer("لطفاً یک دسته بندی را انتخاب کنید:", reply_markup=keyboard_markup)
+    keyboard_markup.add("📚 نویسندگان و موضوعات ثبت شده", "🚫 لغو ثبت نام در تمام موضوعات")  # Added a new button
+
+    await message.answer(f"{greeting}\n\n{security_message}\n\nلطفاً یک دسته بندی را انتخاب کنید:", reply_markup=keyboard_markup)
 
 
 async def show_topics_by(message: types.Message, topics_by, by_type):
@@ -83,6 +105,17 @@ async def register_topic(message: types.Message, state: FSMContext):
         await message.answer(f"ثبت نام شما برای {topic} با موفقیت انجام شد")
     else:
         await message.answer("شما قبلاً برای این موضوع ثبت نام کرده‌اید")
+
+async def deregister_all_topics(message: types.Message):
+    logging.info('deregister_all_topics initiated by user %s', message.from_user.id)
+    user_id = message.from_user.id
+    cursor = conn.cursor()
+    cursor.execute("DELETE FROM registered_users WHERE user_id=?", (user_id,))
+    conn.commit()
+    if cursor.rowcount:
+        await message.answer("شما از تمام موضوعات لغو ثبت نام شدید.", reply_markup=ReplyKeyboardRemove())
+    else:
+        await message.answer("شما در هیچ موضوعی ثبت نام نکرده‌اید.")
 
 async def show_all_writers_with_topics(message: types.Message):
     logging.info('show_all_writers_with_topics initiated by user %s', message.from_user.id)
@@ -133,6 +166,7 @@ if __name__ == '__main__':
     dp.register_message_handler(show_writers, Text(equals="👥 نویسندگان"))
     dp.register_message_handler(register_topic, Text(equals="ثبت نام"))
     dp.register_message_handler(start_command, Text(equals="🔙 بازگشت"))
-    dp.register_message_handler(show_all_writers_with_topics, Text(equals="📚 نویسندگان + موضوعات ثبت شده"))
+    dp.register_message_handler(show_all_writers_with_topics, Text(equals="📚 نویسندگان و موضوعات ثبت شده"))
+    dp.register_message_handler(deregister_all_topics, Text(equals="🚫 لغو ثبت نام در تمام موضوعات"))  # Registering the new function as a handler
 
     executor.start_polling(dp, on_startup=on_startup, skip_updates=True)
